@@ -1,0 +1,66 @@
+Queenie Xiang and Terry Guan
+Systems Programming // Period 5
+Final Project Design Document
+
+
+
+Our project is a spin off of the "rally-racing" game. There will be two players: one guider, one guidee.
+The guidee starts off in the root directory of the project and has to find the finish line located in some directory (it could be a directory or subdirectory)
+that are randomly generated at the start of the game.
+The guider will be given questions (trivia-style) and for every question answered correctly,
+the guider will be told whether he is closer or farther from the finish line.
+The guider then will relay this information to the guidee to help the guidee cd into the correct directory.
+Once the guidee reaches the end destination, the game is over and the team wins.
+
+The project will be used via terminals on separate computers. The users will be asked to enter text based on the given situation.
+
+Topics from class that will be covered by this project include:
+    - Allocating memory
+      creating an array to store questions retrieved from a file
+
+	 - Working with files
+     The questions the guider must answer is stored in a file
+     The answers to those questions are stored in another file
+
+	 - Finding information about files (stat and such)
+	   As the guidee cds into directories, information about their current location will be returned to the guider.
+
+	 - Processes (fork, exec etc.)
+	   The server will be forking off child processes to create subservers that will perform all functionalities.
+	   As the user types in cd or ls, exec will be used
+
+	 - Signals
+	   User can send signals for exiting the game or for the help menu
+
+	 - Pipes (named and unnamed)
+	   Named pipes will be used to send information from server to guider, guider to guidee, and guidee to guider.
+
+   - Semaphores
+     Control the access to the question and answer files (in the case that more than one game is going on)
+
+	 - Networking
+	   Used to connect the two clients (players) to a common server (which will be running the entire game).
+
+Terry Guan Responsibilities
+  - Networking: set up servers for guidee and guider
+  - Processes: Create subservers and implement exec to allow guider to cd and maneauver around directories
+  - Pipes: communication between server and client
+
+Queenie Xiang Responsibilities
+  - Signals: implement signals so when the user quits out the subserver and clients end properly
+  - Finding info about files: implement directory listing
+  - Working with files: create a file with a list of trivia questions and a file with a list of answers
+  - Allocating memory: create an array that will store questions and an array that will store answers
+
+Data Structures
+  - none that are foresable
+
+Algorithms
+  - none that are foresable
+
+Timeline
+1/7/17: Set up question and answer files. Be able to cd into directories. Generate random directories.
+1/10/17: Set up networking, pipes, and subservers.
+1/12/17: Integrate random directory generation into networking. Implement signals
+1/14/17: Randomly add questions and answers to an array and return an item from that array to the guidee.
+1/16/17: Apply bug repellant
