@@ -28,14 +28,6 @@ void main(int argc, char **argv) {
     //select will block until either fd is ready
     select(server_socket + 1, &read_fds, NULL, NULL, NULL);
 
-    if (FD_ISSET(STDIN_FILENO, &read_fds)) {
-      fgets(buffer, sizeof(buffer), stdin);
-      *strchr(buffer, '\n') = 0;
-      write(server_socket, buffer, sizeof(buffer));
-      read(server_socket, buffer, sizeof(buffer));
-      printf("received: [%s]\n", buffer);
-    }//end stdin select
-
     //currently the server is not set up to
     //send messages to all the clients, but
     //this would allow for broadcast messages
@@ -47,6 +39,14 @@ void main(int argc, char **argv) {
       //flush the buffer to immediately print
       fflush(stdout);
     }//end socket select
+
+    if (FD_ISSET(STDIN_FILENO, &read_fds)) {
+      fgets(buffer, sizeof(buffer), stdin);
+      *strchr(buffer, '\n') = 0;
+      write(server_socket, buffer, sizeof(buffer));
+      read(server_socket, buffer, sizeof(buffer));
+      printf("received: [%s]\n", buffer);
+    }//end stdin select
 
   }//end loop
 }
