@@ -28,3 +28,8 @@ void game_setup() {
     } //if user inputs anything other than 1 or 2
   } //end while
 } //end of game_setup()
+
+
+int main() {
+  game_setup();
+}
