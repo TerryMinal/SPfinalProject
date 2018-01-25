@@ -1,4 +1,4 @@
-main: networking.o sclient sserver
+main: networking.o select
 	gcc -o main networking.o main.c
 
 forking: client fserver

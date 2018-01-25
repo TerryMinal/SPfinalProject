@@ -31,14 +31,14 @@ int main() {
     if (FD_ISSET(listen_socket, &read_fds)) {
      client_socket = server_connect(listen_socket);
 
-     f = fork();
-     if (f == 0)
+     // f = fork();
+     // if (f == 0)
        subserver(client_socket);
-     else {
-       subserver_count++;
+     // else {
+     //   subserver_count++;
        close(client_socket);
-     }
-    }//end listen_socket select
+     // }
+    // }//end listen_socket select
 
     //if stdin triggered select
     if (FD_ISSET(STDIN_FILENO, &read_fds)) {
