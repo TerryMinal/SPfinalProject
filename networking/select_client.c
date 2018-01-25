@@ -1,6 +1,6 @@
 #include "networking.h"
 
-int main(int argc, char **argv) {
+void connect_client(int argc, char **argv) {
 
   int server_socket;
   char buffer[BUFFER_SIZE];
