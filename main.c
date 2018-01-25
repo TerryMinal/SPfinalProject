@@ -6,7 +6,8 @@ void game_setup() {
   char str[5];
   printf("1: Host game\n2: Join game\n");
   while (fgets(str,sizeof(str), stdin) ) {
-    if (strcmp(str, "1")) {
+    str[strlen(str)-1] = 0; //Stripping input of the "\n"
+    if (strcmp(str, "1") == 0) {
       char res[5];
       printf("Please create a server by running [make server] in a new terminal\n");
       printf("You will need to acquire your IP address. You can do this by running [ifconfig]\n1: Done\n");
@@ -18,7 +19,7 @@ void game_setup() {
         break;
       }
     } //end of host game
-    else if (strcmp(str, "2")) {
+    else if (strcmp(str, "2") == 0) {
       char res[100];
       printf("Enter ip address/domain of server:\n");
       fgets(res, sizeof(res), stdin);
