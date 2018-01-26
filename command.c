@@ -91,7 +91,7 @@ int execute_args(char *str) {
     }
   }
   else { //meant to prevent users from using any command other than cd and ls
-    printf("that is not a valid command\n");
+    // printf("that is not a valid command\n");
     return 0;
   }
 } //end of execute_args
