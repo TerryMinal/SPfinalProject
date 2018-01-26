@@ -12,8 +12,10 @@ void remove_end_newline(char *str) {
   str[strlen(str) - 1] = 0;
 }
 /*
-Function to setup server for clients to join
+  Function to setup server for clients to join
 */
+
+
 void game() {
   char str[5];
   printf("1: Host game\n2: Join game\n");
@@ -51,10 +53,12 @@ void talk_to_client(int client_socket) {
   char buffer[BUFFER_SIZE];
   int state = 0;
   char *ans;
+  char * space = " ";
   printf("talk to your drivee\n");
   while (1) {
-    read(client_socket, buffer, sizeof(buffer));
+    read(client_socket, buffer, sizeof(buffer)); 
     if (state == 1) {
+      printf("state1\n");
       int i = 0;
       for(; buffer[i]; i++) {
         buffer[i] = tolower(buffer[i]);
@@ -69,14 +73,18 @@ void talk_to_client(int client_socket) {
       printf("player2: %s\n", buffer);
       fgets(buffer, sizeof(buffer), stdin); //gets input from user
       remove_end_newline(buffer);
-      if (execute_args(buffer)) {
-        if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
-          //send a question to the drivee
-          //keep answer to that question in this string var
-          // ans = ;
-          state = 1;
-        }
+      if (execute_args(parse_args(buffer, space))) {
+	printf("executing\n");
       }
+      
+      if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
+	printf("Working cd\n");
+	//send a question to the drivee
+	//keep answer to that question in this string var
+	// ans = ;
+	state = 1;
+      }
+    
       else
         write(client_socket, buffer, sizeof(buffer)); // writes to other user
     }

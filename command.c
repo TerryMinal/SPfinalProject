@@ -56,7 +56,7 @@ char ** parse_args(char * line, char * delimiter ) {
 // given array of commands such as [ls -al, cd .., less main.c]
 // executes all the given commands
 // array can be obtained through parse_args(args, STR_SEMICOLON)
-int execute_args(char *str) {
+int execute_args(char **args) {
   char *EXIT = "exit";
   char *CD = "cd";
   char **arg; //array of single command
@@ -64,37 +64,71 @@ int execute_args(char *str) {
   int i = 0; // incrementor for array
   int p; // used for forking
 
-  arg = parse_args(str, STR_SPACE); //splits into command and args in non redirectional commands
-  // print_args(arg);
-  // trim_spaces(arg[0]);
-  //checking for special cases exit and cd
-  if (strcmp (EXIT, arg[0]) == 0 ) { // checking for exit command case
-    printf("User exited!\n");
-    exit(1);
-  }
-  else if (strcmp (arg[0], CD) == 0) { // checking for cd command case
-    chdir(arg[1]); // changes current directory
-    return 1;
-  }
-  //finished checking for special cases
-  else if (strcmp(arg[0], "ls") == 0) {
-    p = fork();
-    if (p == 0) { // child process
-      // trim_spaces(arg[1]);
-      arg[1] = NULL;
-      execvp(arg[0], arg); //prevents user from using al and seeing size of directory
-      exit(1); //quits the child process
+
+  while ( *(args+i) != NULL) { // loops through all the commands
+    arg = parse_args( *(args+i), STR_SPACE); //splits into command and args in non redirectional commands
+    // print_args(arg);
+    // trim_spaces(arg[0]);
+    //checking for special cases exit and cd
+
+    if (strcmp (EXIT, arg[0]) == 0 ) { // checking for exit command case
+      printf("User exited!\n");
+      exit(1);
     }
+      
+    else if (strcmp (arg[0], CD) == 0) { // checking for cd command case
+      chdir(arg[1]); // changes current directory
+    }
+
+    //finished checking for special cases
     else {
-      wait(&status);
-      return 1;
+      p = fork();
+      if (p == 0) { // child process
+	// trim_spaces(arg[1]);
+	execvp(arg[0], arg);
+	exit(1); //quits the child process
+      }
+      else
+	wait(&status);
     }
-  }
-  else { //meant to prevent users from using any command other than cd and ls
-    // printf("that is not a valid command\n");
-    return 0;
-  }
+    i++;
+  }// end while
+  // after function runs all commands have been run
+  return 0;
+}
+
+/* arg = parse_args(str, STR_SPACE); //splits into command and args in non redirectional commands
+// print_args(arg);
+// trim_spaces(arg[0]);
+//checking for special cases exit and cd
+if (strcmp (EXIT, arg[0]) == 0 ) { // checking for exit command case
+printf("User exited!\n");
+exit(1);
+}
+else if (strcmp (arg[0], CD) == 0) { // checking for cd command case
+chdir(arg[1]); // changes current directory
+return 1;
+}
+//finished checking for special cases
+else if (strcmp(arg[0], "ls") == 0) {
+p = fork();
+if (p == 0) { // child process
+// trim_spaces(arg[1]);
+arg[1] = NULL;
+execvp(arg[0], arg); //prevents user from using al and seeing size of directory
+exit(1); //quits the child process
+}
+else {
+wait(&status);
+return 1;
+}
+}
+else { //meant to prevent users from using any command other than cd and ls
+// printf("that is not a valid command\n");
+return 0;
+}
 } //end of execute_args
+*/
 
 // int main() {
 //   char str[100];
