@@ -121,7 +121,7 @@ void game() {
         int listen_socket = server_setup();
         int client_socket = server_connect(listen_socket);
 	
-	printf("Start? \n1: Yes \n2: No\n");
+	printf("Type q to start\n");
 	if (!setup) {
 	  //Setting up random directories: 
 	  char alphabet[] = "abcedfghijklmnopqrstuvwxyz";
@@ -237,8 +237,8 @@ void talk_to_client(int client_socket, char* directory) {
     
     if (state == 1) {
       printf("Answer:\n");
-
-      fgets(buffer, sizeof(buffer), stdin);
+      printf("ans: %s", ans);
+      //fgets(buffer, sizeof(buffer), stdin);
 
       int count = 0;
       for(; buffer[count]; count++) {
@@ -257,14 +257,13 @@ void talk_to_client(int client_socket, char* directory) {
     }
 
     printf("Please type q for question\n");
-    else if (state == 0) {
+    if (state == 0) {
       printf("player2: %s\n", buffer);
       fgets(buffer, sizeof(buffer), stdin); //gets input from user
       remove_end_newline(buffer);
       
       execute_args(parse_args(buffer, space));
-      
-      
+
       if (strstr(buffer, "q") != NULL) {
 	QnA_arr = QnA_generator(directory[i]); 
 	printf("directory: %s\n", directory);
@@ -274,7 +273,7 @@ void talk_to_client(int client_socket, char* directory) {
 	//printf("Q: %s", QnA_arr[0]);
 	printf("Question: %s\n", QnA_arr[0]);
 	ans = QnA_arr[1];
-	state = 1;
+	//state = 1;
       }
       
       else if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
@@ -283,7 +282,7 @@ void talk_to_client(int client_socket, char* directory) {
 	//state = 1;
       }
     
-      else
+      
         write(client_socket, buffer, sizeof(buffer)); // writes to other user
     }
   }
@@ -295,13 +294,16 @@ void talk_to_client(int client_socket, char* directory) {
 void talk_to_server(int server_socket) {
   char buffer[BUFFER_SIZE];
   int i = 0;
+  char * space = " ";
   printf("talk to your driver\n");
   while (1) {
     fgets(buffer, sizeof(buffer), stdin);
     // *strchr(buffer, '\n') = 0;
     
     remove_end_newline(buffer);
+    execute_args(parse_args(buffer, space));
     write(server_socket, buffer, sizeof(buffer));
+    
     read(server_socket, buffer, sizeof(buffer));
     printf("player1: %s\n", buffer);
     if (strstr(buffer, "q") != NULL) {
