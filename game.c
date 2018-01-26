@@ -15,6 +15,86 @@ void remove_end_newline(char *str) {
   Function to setup server for clients to join
 */
 
+char ** QnA_generator(char letter_dir) {
+
+  char questions_file[4096] = "questions";
+  char txt_ending[1024] = ".txt";
+    
+  char letter = toupper(letter_dir);    
+  //printf("*dest: %c\n", *destination);
+    
+  char * letter_ptr = &letter;
+
+  //printf("letter: %c\n", *letter_ptr);
+  strcat(questions_file, letter_ptr);
+  strcat(questions_file, txt_ending);
+
+  //printf("questions_file: %s\n", questions_file);
+
+  int fd = open(questions_file, O_RDONLY);
+  //printf("fd: %d\n", fd);
+
+  char buffer[8192];
+  read(fd, buffer, sizeof(buffer));
+
+  //printf("buffer: %s", buffer);
+   
+  char ** arr = (char **) calloc(12, sizeof(buffer));
+  char ** arr_ptr = arr;
+  char * ptr = buffer;
+      
+  while (ptr != NULL) {
+    //printf("%s\n", strsep(&ptr, "\n"));
+    //The pointer points to a new location, which is why the address of it is passed into strsep
+    *(arr) = strsep( &ptr, "\n");
+    //printf("%s\n", *arr);
+    arr++; 
+  }
+    
+  int i = 0;
+  int count = 0; 
+
+  char ** arr_questions = (char **) calloc(12, sizeof(buffer));
+  char ** arr_answers  = (char **) calloc(12, sizeof(buffer));
+    
+  arr = arr_ptr;
+    
+  while (arr[i+2]) {
+    //printf("arr[%d]:%s\n", i, arr[i]);
+    if (strcmp(arr[i], "") == 0) {
+      //printf("Nothing here, breaking!\n");
+      break;
+    }
+      
+    if (i % 2 == 0) {
+      arr_questions[count] = arr[i];
+      arr_answers[count] = arr[i+1];
+      //printf("arrQ[%d]:%s\n", count, arr_questions[count]);
+      //printf("arrA[%d]:%s\n", count, arr_answers[count]);
+      count++;
+    }
+    i++;
+  }
+    
+  srand(time(NULL));
+  int rand_num = rand()%5;
+  //printf("\nrandQ: %d\n", rand_num);
+  //printf("arrQ[%d]:%s\n", rand_num, arr_questions[rand_num]);
+  //printf("arrA[%d]:%s\n", rand_num, arr_answers[rand_num]);
+
+  char ** arr_QnA = (char **) calloc(2, sizeof(buffer));
+
+  arr_QnA[0] = arr_questions[rand_num];
+  arr_QnA[1] = arr_answers[rand_num];
+
+
+  free(arr_questions);
+  free(arr_answers);
+  free(arr);
+  return arr_QnA;
+}
+
+
 
 void game() {
   char str[5];
@@ -30,7 +110,78 @@ void game() {
         printf("waiting on player to join...\n");
         int listen_socket = server_setup();
         int client_socket = server_connect(listen_socket);
-        //random directory setup goes here
+	/*
+	  printf("Start? \n1: Yes \n2: No\n");
+	if (strcmp(res, "1") == 0) {
+	  //Setting up random directories: 
+	  char alphabet[] = "abcedfghijklmnopqrstuvwxyz";
+	  char * name = &(alphabet[ (int) (rand()%26) ]);
+	  //printf("%s\n", name);
+
+	  //Generating the random number of directories being made
+	  int rannum;
+	  srand(time(NULL));
+	
+	  int rand_num1 = rand()%10;
+	  //printf("Rand num1: %d\n", rand_num1);
+	
+	  int rand_num2 = rand()%10;
+	  int rand_num2_copy = rand_num2;
+	  //printf("Rand num2: %d\n", rand_num2);
+
+	  int percentage = rand()%10;
+
+	  for (; rand_num1 > 0; rand_num1--) {
+	    //printf("Randnum1: %d\n", rand_num1);
+	  
+	    //Generating random name for directory
+	    char * name = &(alphabet[ (int) (rand()%26) ]);
+	    //printf("%s\n", name);
+	  
+	    //Formatting name of directory
+	    char dir_1[1024] = "./";
+	    strcat(dir_1, name);
+	    //printf("Dirname: %s\n", dir_1);
+	    mkdir(dir_1, 0700);
+
+	    int ret = chdir(name);
+	    //printf("Successful cd-ing into directory?: %d\n", ret);
+
+	    for (; rand_num2 > 0; rand_num2--) {
+	      //printf("Randnum2: %d\n", rand_num2);
+	      //printf("Making directories\n");
+
+	      //Generating random name for directory
+	      char * name = &(alphabet[ (int) (rand()%26) ]);
+
+	      //Formatting name of directory
+	      char dir[1024] = "./";
+	      strcat(dir, name);
+	      //printf("Dirname: %s\n", dir);
+
+	      //Making directory
+	      mkdir(dir, 0700);
+
+	      if (percentage < 5) {
+		int fd = open("victory_file.txt", O_RDWR);
+		if (fd != -1) {
+		  write(fd, "Congratulations, you've reached the correct destination!", 1024);
+		  close(fd);
+		  directory = name; 
+		}
+	      }
+
+	      else {
+		percentage--;
+	      }
+	      
+	    }
+	    char * root = "../";
+	    int back = chdir(root);
+	    //printf("Went back to root: %d\n", back);
+	    rand_num2 = rand_num2_copy;
+	  }
+	*/
         talk_to_client(client_socket);
       }
     } //end of host game
@@ -66,6 +217,12 @@ void talk_to_client(int client_socket) {
       if (strcmp(ans,buffer) == 0) {
         //send next letter to the drivee... drivee then has to send it back to the driver
         //drivee then tells driver where next to go
+	/*
+	char letter = *directory;
+	char * letter_ptr = &letter;
+	write(client_socket, letter_ptr, sizeof(buffer));
+	directory++; 
+	*/
         state = 0;
       }
     }
@@ -79,9 +236,14 @@ void talk_to_client(int client_socket) {
       
       if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
 	printf("Working cd\n");
-	//send a question to the drivee
-	//keep answer to that question in this string var
-	// ans = ;
+	//char ** QnA_arr = (char **)calloc(2, 4096); 
+	//QnA_arr = QnA_generator(*directory);
+	//printf("Q: %s", QnA_arr[0]);
+	//write(server_socket, QnA_arr[0], 4096);
+	//printf("Question: %s\n", QnA_arr[0]);
+	  
+	  
+	//ans = QnA_arr[1];
 	state = 1;
       }
     
