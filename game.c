@@ -3,10 +3,12 @@
 #include "command.c"
 #include <time.h>
 
+char directory[1024] = "";
+char * dir_pointer;
 
 void remove_end_newline(char *str);
 void game();
-void talk_to_client(int client_socket);
+void talk_to_client(int client_socket, char* directory);
 void talk_to_server(int server_socket);
 
 void remove_end_newline(char *str) {
@@ -16,22 +18,24 @@ void remove_end_newline(char *str) {
   Function to setup server for clients to join
 */
 
+
 char ** QnA_generator(char letter_dir) {
 
   char questions_file[4096] = "questions";
   char txt_ending[1024] = ".txt";
     
-  char letter = toupper(letter_dir);    
-  //printf("*dest: %c\n", *destination);
+  letter_dir = toupper(letter_dir);    
+  //printf("*dest: %c\n", letter_dir);
     
-  char * letter_ptr = &letter;
+  char * letter_ptr = &letter_dir;
 
   //printf("letter: %c\n", *letter_ptr);
   strcat(questions_file, letter_ptr);
   strcat(questions_file, txt_ending);
+  // printf("questions_file: %s\n", questions_file);
 
-  //printf("questions_file: %s\n", questions_file);
-
+  char * root = "../";
+  int back = chdir(root);
   int fd = open(questions_file, O_RDONLY);
   //printf("fd: %d\n", fd);
 
@@ -39,7 +43,7 @@ char ** QnA_generator(char letter_dir) {
   read(fd, buffer, sizeof(buffer));
 
   //printf("buffer: %s", buffer);
-   
+  
   char ** arr = (char **) calloc(12, sizeof(buffer));
   char ** arr_ptr = arr;
   char * ptr = buffer;
@@ -87,6 +91,9 @@ char ** QnA_generator(char letter_dir) {
 
   arr_QnA[0] = arr_questions[rand_num];
   arr_QnA[1] = arr_answers[rand_num];
+  //printf("arrQ[0]:%s\n", arr_QnA[0]);
+  //printf("arrA[0]:%s\n", arr_QnA[1]);
+  
 
 
   free(arr_questions);
@@ -99,6 +106,8 @@ char ** QnA_generator(char letter_dir) {
 
 void game() {
   char str[5];
+  int setup = 0;
+  int created = 0;
   printf("1: Host game\n2: Join game\n");
   while (fgets(str,sizeof(str), stdin) ) {
     str[strlen(str)-1] = 0; //Stripping input of the "\n"
@@ -111,9 +120,9 @@ void game() {
         printf("waiting on player to join...\n");
         int listen_socket = server_setup();
         int client_socket = server_connect(listen_socket);
-	/*
-	  printf("Start? \n1: Yes \n2: No\n");
-	if (strcmp(res, "1") == 0) {
+	
+	printf("Start? \n1: Yes \n2: No\n");
+	if (!setup) {
 	  //Setting up random directories: 
 	  char alphabet[] = "abcedfghijklmnopqrstuvwxyz";
 	  char * name = &(alphabet[ (int) (rand()%26) ]);
@@ -163,29 +172,39 @@ void game() {
 	      //Making directory
 	      mkdir(dir, 0700);
 
-	      if (percentage < 5) {
-		int fd = open("victory_file.txt", O_RDWR);
+	      if (percentage < 6 && !(created)) {
+		chdir(name);
+		strcat(directory, name);
+		//printf("dir: %s\n", directory);
+		dir_pointer = directory;
+		//printf("file made\n");
+		int fd = open("victory_file.txt", O_RDWR | O_CREAT);
+		//printf("fd: %d\n", fd);
 		if (fd != -1) {
 		  write(fd, "Congratulations, you've reached the correct destination!", 1024);
-		  close(fd);
-		  directory = name; 
+		  close(fd); 	 
 		}
+		created = 1;
 	      }
 
 	      else {
 		percentage--;
 	      }
-	      
+		
 	    }
+	    
+	    
 	    char * root = "../";
 	    int back = chdir(root);
 	    //printf("Went back to root: %d\n", back);
 	    rand_num2 = rand_num2_copy;
 	  }
-	*/
-        talk_to_client(client_socket);
+	}
+	talk_to_client(client_socket, directory);
+	//dir_pointer = directory;
       }
-    } //end of host game
+    }
+	
     else if (strcmp(str, "2") == 0) { //user
       char res[100];
       printf("Enter ip address/domain of server:\n");
@@ -195,57 +214,73 @@ void game() {
       printf("connected to host\n");
       talk_to_server(server_socket);
     } //end of join game
+    
     else {
       printf("Not a valid input\n");
     } //if user inputs anything other than 1 or 2
   } //end while
 } //end of game_setup()
 
-void talk_to_client(int client_socket) {
+void talk_to_client(int client_socket, char* directory) {
   char buffer[BUFFER_SIZE];
+  int i = 0;
   int state = 0;
   char *ans;
   char * space = " ";
+  char ** QnA_arr = (char **)calloc(2, 4096);
   printf("talk to your drivee\n");
   while (1) {
-    read(client_socket, buffer, sizeof(buffer)); 
+    //printf("dir: %s", dir_pointer);
+    read(client_socket, buffer, sizeof(buffer));
+    fgets(buffer, sizeof(buffer), stdin); //gets input from user
+    
+    
     if (state == 1) {
-      printf("state1\n");
-      int i = 0;
-      for(; buffer[i]; i++) {
-        buffer[i] = tolower(buffer[i]);
+      printf("Answer:\n");
+
+      fgets(buffer, sizeof(buffer), stdin);
+
+      int count = 0;
+      for(; buffer[count]; count++) {
+        buffer[count] = tolower(buffer[count]);
       } // make into all lowercase
-      if (strcmp(ans,buffer) == 0) {
+      
+      if (strstr(ans,buffer) != NULL) {
         //send next letter to the drivee... drivee then has to send it back to the driver
         //drivee then tells driver where next to go
-	/*
-	char letter = *directory;
+	char letter = directory[i];
 	char * letter_ptr = &letter;
 	write(client_socket, letter_ptr, sizeof(buffer));
 	directory++; 
-	*/
         state = 0;
       }
     }
+
+    printf("Please type q for question\n");
     else if (state == 0) {
       printf("player2: %s\n", buffer);
       fgets(buffer, sizeof(buffer), stdin); //gets input from user
       remove_end_newline(buffer);
-      if (execute_args(parse_args(buffer, space))) {
-	printf("executing\n");
+      
+      execute_args(parse_args(buffer, space));
+      
+      
+      if (strstr(buffer, "q") != NULL) {
+	QnA_arr = QnA_generator(directory[i]); 
+	printf("directory: %s\n", directory);
+	printf("letter: %c\n", directory[i]);
+	//printf("\nAsked FOR Question\n");
+	//printf("Question:\n"); 
+	//printf("Q: %s", QnA_arr[0]);
+	printf("Question: %s\n", QnA_arr[0]);
+	ans = QnA_arr[1];
+	state = 1;
       }
       
-      if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
+      else if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
 	printf("Working cd\n");
-	//char ** QnA_arr = (char **)calloc(2, 4096); 
-	//QnA_arr = QnA_generator(*directory);
-	//printf("Q: %s", QnA_arr[0]);
-	//write(server_socket, QnA_arr[0], 4096);
-	//printf("Question: %s\n", QnA_arr[0]);
-	  
-	  
-	//ans = QnA_arr[1];
-	state = 1;
+	
+	//state = 1;
       }
     
       else
@@ -253,19 +288,35 @@ void talk_to_client(int client_socket) {
     }
   }
   close(client_socket);
+  free(QnA_arr);
   exit(0);
 } //end of talk to client
 
 void talk_to_server(int server_socket) {
   char buffer[BUFFER_SIZE];
+  int i = 0;
   printf("talk to your driver\n");
   while (1) {
     fgets(buffer, sizeof(buffer), stdin);
     // *strchr(buffer, '\n') = 0;
+    
     remove_end_newline(buffer);
     write(server_socket, buffer, sizeof(buffer));
     read(server_socket, buffer, sizeof(buffer));
     printf("player1: %s\n", buffer);
+    if (strstr(buffer, "q") != NULL) {
+      printf("Press enter to give question\n");
+      // printf("directory: %s", dir_pointer);
+      //printf("\nAsked FOR Question\n");
+      //printf("Question:\n");
+      //printf("dir: %s", directory);
+      //char * letter = &directory[i];
+      //printf("dir: %s",letter);
+      // QnA_arr = QnA_generator(*directory);
+      //printf("Q: %s", QnA_arr[0]);
+      //printf("Question: %s\n", QnA_arr[0]);
+      //ans = QnA_arr[1];
+    }
   }
   close(server_socket);
   exit(0);
@@ -273,4 +324,5 @@ void talk_to_server(int server_socket) {
 
 int main() {
   game();
+  printf("dir: %s", directory);
 }
