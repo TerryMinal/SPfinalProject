@@ -90,7 +90,8 @@ void talk_to_server(int server_socket) {
   printf("talk to your driver\n");
   while (1) {
     fgets(buffer, sizeof(buffer), stdin);
-    *strchr(buffer, '\n') = 0;
+    // *strchr(buffer, '\n') = 0;
+    remove_end_newline(buffer);
     write(server_socket, buffer, sizeof(buffer));
     read(server_socket, buffer, sizeof(buffer));
     printf("player1: %s\n", buffer);
