@@ -31,6 +31,9 @@ void game_setup() {
         //random directory setup goes here
         talk_to_client(client_socket);
       }
+      else {
+        printf("oops didnt get rigth input\n");
+      }
     } //end of host game
     else if (strcmp(str, "2") == 0) { //user
       char res[100];
