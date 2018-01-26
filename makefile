@@ -36,4 +36,4 @@ command:
 		gcc -c command.c
 
 clean:
-	rm *.o || rm *~ || rm client main server
+	rm *.o || rm *~ || rm client main server game comm
