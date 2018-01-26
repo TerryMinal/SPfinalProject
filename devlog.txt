@@ -1,0 +1,27 @@
+Team Tscjhair Attack
+Terry Guan, Shaina Peters, Caleb Smith-Salzberg, Jennifer Zhang
+SoftDev pd7
+
+**********<>***********
+Format (APPEND TO END)
+firstL -- TIMESTAMP
+**********<>***********
+
+terryG -- 2018-01-06 3:00 PM
+--------------------------------
+- local design doc started
+
+terryG -- 2018-01-20 6:00 PM
+--------------------------------
+- added rudimentary subserver-ing network
+
+terryG -- 2018-01-24 1:00 PM
+--------------------------------
+- subserver network proved to be not working
+- added new network for only two computers
+
+terryG -- 2018-01-25 6:00 PM
+--------------------------------
+- added messaging functions and question and answer states
+- added bash exec conditions
+- finished README.md
