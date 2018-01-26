@@ -25,6 +25,7 @@ void game_setup() {
       remove_end_newline(res);
       printf("debug statement\n");
       if (strcmp(res, "1")) { // user should've set up server by now
+        printf("debug statement\n");
         int listen_socket = server_setup();
         printf("waiting on player to join...\n");
         int client_socket = server_connect(listen_socket);
