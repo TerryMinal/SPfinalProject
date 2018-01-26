@@ -1,5 +1,5 @@
 main: networking.o command
-	gcc -o main networking.o main.c
+	gcc -o game networking.o game.c
 
 # forking: client fserver
 #

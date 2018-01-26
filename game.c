@@ -1,9 +1,10 @@
+#include <ctype.h>
 #include "networking.h"
 #include "command.c"
 
 
 void remove_end_newline(char *str);
-void game_setup();
+void game();
 void talk_to_client(int client_socket);
 void talk_to_server(int server_socket);
 
@@ -13,7 +14,7 @@ void remove_end_newline(char *str) {
 /*
 Function to setup server for clients to join
 */
-void game_setup() {
+void game() {
   char str[5];
   printf("1: Host game\n2: Join game\n");
   while (fgets(str,sizeof(str), stdin) ) {
@@ -48,20 +49,36 @@ void game_setup() {
 
 void talk_to_client(int client_socket) {
   char buffer[BUFFER_SIZE];
-
+  int state = 0;
+  char *ans;
+  printf("talk to your drivee\n");
   while (1) {
     read(client_socket, buffer, sizeof(buffer));
-    printf("player2: %s\n", buffer);
-    fgets(buffer, sizeof(buffer), stdin); //gets input from user
-    // printf("[subserver %d] received: [%s]\n", getpid(), buffer);
-    remove_end_newline(buffer);
-    if (execute_args(buffer)) {
-      if (strstr(buffer, "cd") != NULL) {
-        //send a question to the drivee
+    if (state == 1) {
+      int i = 0;
+      for(; buffer[i]; i++) {
+        buffer[i] = tolower(buffer[i]);
+      } // make into all lowercase
+      if (strcmp(ans,buffer) == 0) {
+        //send next letter to the drivee... drivee then has to send it back to the driver
+        //drivee then tells driver where next to go
+        state = 0;
       }
     }
-    else {
-      write(client_socket, buffer, sizeof(buffer)); // writes to other user
+    else if (state == 0) {
+      printf("player2: %s\n", buffer);
+      fgets(buffer, sizeof(buffer), stdin); //gets input from user
+      remove_end_newline(buffer);
+      if (execute_args(buffer)) {
+        if (strstr(buffer, "cd") != NULL) { //if user cd's into a directory, send the drivee a question
+          //send a question to the drivee
+          //keep answer to that question in this string var
+          // ans = ;
+          state = 1;
+        }
+      }
+      else
+        write(client_socket, buffer, sizeof(buffer)); // writes to other user
     }
   }
   close(client_socket);
@@ -70,17 +87,18 @@ void talk_to_client(int client_socket) {
 
 void talk_to_server(int server_socket) {
   char buffer[BUFFER_SIZE];
-
+  printf("talk to your driver\n");
   while (1) {
-    printf("enter data: ");
     fgets(buffer, sizeof(buffer), stdin);
     *strchr(buffer, '\n') = 0;
     write(server_socket, buffer, sizeof(buffer));
     read(server_socket, buffer, sizeof(buffer));
     printf("player1: %s\n", buffer);
   }
+  close(server_socket);
+  exit(0);
 } //end of talk to server
 
 int main() {
-  game_setup();
+  game();
 }
