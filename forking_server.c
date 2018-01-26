@@ -1,7 +1,6 @@
 #include "networking.h"
 
-void process(char *s);
-void subserver(int from_client);
+void talk(int client_socket);
 
 int main() {
 
@@ -9,36 +8,15 @@ int main() {
   int f;
   listen_socket = server_setup();
 
-  while (1) {
+  // while (1) {
 
+    // blocks
     int client_socket = server_connect(listen_socket);
-    f = fork();
-    if (f == 0)
-      subserver(client_socket);
-    else
-      close(client_socket);
-  }
-}
-
-void subserver(int client_socket) {
-  char buffer[BUFFER_SIZE];
-
-  while (read(client_socket, buffer, sizeof(buffer))) {
-
-    printf("[subserver %d] received: [%s]\n", getpid(), buffer);
-    process(buffer);
-    write(client_socket, buffer, sizeof(buffer));
-  }//end read loop
-  close(client_socket);
-  exit(0);
-}
-
-void process(char * s) {
-  while (*s) {
-    if (*s >= 'a' && *s <= 'z')
-      *s = ((*s - 'a') + 13) % 26 + 'a';
-    else  if (*s >= 'A' && *s <= 'Z')
-      *s = ((*s - 'a') + 13) % 26 + 'a';
-    s++;
-  }
+    talk(client_socket);
+    // f = fork();
+    // if (f == 0)
+    //   subserver(client_socket);
+    // else
+    close(client_socket);
+  // }
 }

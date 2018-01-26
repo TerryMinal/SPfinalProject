@@ -16,6 +16,6 @@ int main(int argc, char **argv) {
     *strchr(buffer, '\n') = 0;
     write(server_socket, buffer, sizeof(buffer));
     read(server_socket, buffer, sizeof(buffer));
-    printf("received: [%s]\n", buffer);
+    printf("player1: %s\n", buffer);
   }
 }
