@@ -15,6 +15,12 @@ terryG -- 2018-01-20 6:00 PM
 --------------------------------
 - added rudimentary subserver-ing network
 
+queenieX -- 2018-01-23 5:30PM
+--------------------------------
+-Created generation of random directories
+-Created list of questions
+-Created QnA generator that allows for generation of questions and answers based on one letter 
+
 terryG -- 2018-01-24 1:00 PM
 --------------------------------
 - subserver network proved to be not working
