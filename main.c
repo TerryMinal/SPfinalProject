@@ -23,7 +23,7 @@ void game_setup() {
       printf("You will need to acquire your IP address and send it to your friend. You can do this by running [ifconfig]\n1: Done\n");
       fgets(res, sizeof(res), stdin);
       remove_end_newline(res);
-      if (strcmp(res, "1")) { // user should've set up server by now
+      while (strcmp(res, "1")) { // user should've set up server by now
         int listen_socket = server_setup();
         printf("waiting on player to join...\n");
         int client_socket = server_connect(listen_socket);
