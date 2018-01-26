@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include "networking.h"
 #include "command.c"
+#include <time.h>
 
 
 void remove_end_newline(char *str);
