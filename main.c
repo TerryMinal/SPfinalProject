@@ -23,16 +23,12 @@ void game_setup() {
       printf("You will need to acquire your IP address and send it to your friend. You can do this by running [ifconfig]\n1: Done\n");
       fgets(res, sizeof(res), stdin);
       remove_end_newline(res);
-      printf("debug statement\n");
-      if (strcmp(res, "1")) { // user should've set up server by now
+      if (strcmp(res, "1") == 0) { // user should've set up server by now
         printf("waiting on player to join...\n");
         int listen_socket = server_setup();
         int client_socket = server_connect(listen_socket);
         //random directory setup goes here
         talk_to_client(client_socket);
-      }
-      else {
-        printf("oops didnt get rigth input\n");
       }
     } //end of host game
     else if (strcmp(str, "2") == 0) { //user
